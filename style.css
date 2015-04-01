@@ -1,0 +1,380 @@
+body {
+	background-color: #e9eaed;
+	font-family: Helvetica, sans-serif;
+}
+
+footer {
+	margin: 20px;
+	margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.right {
+	float: right;
+}
+
+.center {
+	float: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.left {
+	float: left;
+}
+
+div.content50Percent {
+	margin-left: auto;
+    margin-right: auto;
+    min-width: 600px;
+	width: 50%;
+}
+
+div.content40Percent {
+	margin-left: auto;
+    margin-right: auto;
+    min-width: 480px;
+	width: 40%;
+}
+
+div.content30Percent {
+	margin-left: auto;
+    margin-right: auto;
+    min-width: 360px;
+	width: 30%;
+}
+
+div.content20Percent {
+	margin-left: auto;
+    margin-right: auto;
+    min-width: 240px;
+	width: 20%;
+}
+
+div.column90Percent {
+	float: left;
+	width: 90%;
+}
+
+div.column10Percent {
+	float: right;
+	width: 10%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a.goBack {
+	position: relative;
+	color: #AA0000;
+}
+
+a.goBack:hover {
+	color: #EE0000;
+	cursor: pointer;
+}
+
+/* Site Header */
+
+header {
+	background-color: #AA0000;
+	height: 50px;
+	overflow: hidden;
+	border-bottom: 2px solid #999999;
+}
+
+.siteLogo {
+	float: left;
+	margin: 10px;
+	height: 30px;
+	font-weight: bold;
+	text-decoration: none;
+	line-height: 30px;
+	font-size: 38px;
+	color: white;
+}
+
+.siteLogo:hover {
+	cursor: pointer;
+}
+
+.account {
+	float: right;
+	margin: 10px;
+}
+
+.account:hover {
+	cursor: pointer;
+}
+
+.accountImage {
+	float: right;
+	background-color: #FFFFFF;
+	margin: -2px;
+	margin-left: 12px;
+	border: 2px solid #880000;
+	width: 30px;
+	height: 30px;
+}
+
+.accountText {
+	float: right;
+	font-weight: bold;
+	line-height: 30px;
+	color: white;
+}
+
+/* Index & Post Pages */
+
+.post {
+	margin-top: 5px;
+}
+
+.postProfile {
+	position: relative;
+	top: 50px;
+	height: 52px;
+	background-color: #FFFFFF;
+}
+
+.postProfileImage {
+	float: left;
+	background-color: white;
+	border: 1px solid #AA0000;
+	margin-top: -50px;
+	width: 100px;
+	height: 100px;
+}
+
+.postProfileName {
+	float: left;
+	margin: 0px 10px;
+	line-height: 50px;
+	font-weight: bold;
+}
+
+.postProfileInfo {
+	float: right;
+	height: 50px;
+	margin-top: 7px;
+	margin-right: 10px;
+}
+
+.postDate {
+	float: right;
+	text-align: right;
+	font-size: 12px;
+}
+
+.likeButton {
+	background-image: url("img/star-inactive.gif");
+	border: none;
+	background-color: white;
+	margin-left: 10px;
+	width: 35px;
+	height: 35px;
+}
+
+.likeButtonPressed {
+	background-image: url("img/star-active.gif");
+	border: none;
+	background-color: white;
+	margin-left: 10px;
+	width: 35px;
+	height: 35px;
+}
+
+.postDate:hover {
+	cursor: pointer;
+}
+
+.commentIndicator {
+	float: right;
+	text-align: right;
+	font-size: 14px;
+	text-decoration: none;
+	color: #AA0000;
+}
+
+.commentIndicator:hover {
+	cursor: pointer;
+	color: #EE0000;
+}
+
+.postArea {
+	position: relative;
+	margin-top: 50px;
+	margin-left: 51px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 60px;
+	background-color: white;
+}
+
+.comment {
+	margin-top: 5px;
+	margin-left: 50px;
+}
+
+.commentProfile {
+	height: 52px;
+	background-color: #FFFFFF;
+}
+
+.commentProfileImage {
+	float: left;
+	background-color: white;
+	border: 1px solid #AA0000;
+	width: 50px;
+	height: 50px;
+}
+
+.commentProfileName {
+	float: left;
+	margin: 0px 10px;
+	line-height: 50px;
+	font-weight: bold;
+}
+
+.commentArea {
+	margin-left: 51px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	background-color: white;
+}
+
+.postImage {
+	max-width:100%;
+}
+
+.makeComment {
+	margin-top: 5px;
+	margin-left: 50px;
+	background-color: white;
+}
+
+/* Login & Register Pages */
+
+#loginForm {
+	background-color: white;
+}
+
+.loginHeader {
+	margin-top: 10px;
+	padding: 10px 0px 0px 10px;
+}
+
+.registerCenter {
+	margin-left: auto;
+    margin-right: auto;
+	width: 80%;
+}
+
+#registerDateOfBirth {
+	margin-left: -5px;
+}
+
+form {
+	text-align: center;
+}
+
+input[type=text], input[type=password] {
+	margin: 5px auto;
+	height: 30px;
+	font-size: 24px;
+	width: 80%;
+}
+
+input[type=text].error, input[type=password].error {
+	margin: 5px auto;
+	border: 1px solid red;
+	height: 30px;
+	font-size: 24px;
+	width: 80%;
+}
+
+.postUpdate, input[type=submit] {
+	width: 100%;
+	height: 50px;
+	margin-top: 5px;
+	background-color: #AA0000;
+	border: 1px solid #AA0000;
+	color: white;
+	font-size: 20px;
+}
+
+.postUpdate:hover, input[type=submit]:hover, input[type=button]:hover {
+	cursor: pointer;
+	background-color: #EE0000;
+}
+
+input[type=submit].createAccount {
+	background-color: transparent;
+	border: none;
+	color: #AA0000;
+}
+
+input[type=submit].createAccount:hover {
+	background-color: transparent;
+	color: #EE0000;
+}
+
+input[type=button] {
+	background-color: #AA0000;
+	border: 1px solid #AA0000;
+}
+
+textarea {
+	font-size: 14px;
+	height: 100px;
+}
+
+textarea.error {
+	border: 1px solid red;
+	font-size: 14px;
+	height: 100px;
+}
+
+fieldset {
+	margin: -10px;
+	border: none;
+}
+
+select {
+	margin-top: 5px;
+	height: 30px;
+	font-size: 20px;
+}
+
+select.error {
+	border: 1px solid red;
+	margin-top: 5px;
+	height: 30px;
+	font-size: 20px;
+}
+
+p {
+	margin: 0px;
+}
+
+p.error {
+    color: red;
+}
+
+.uploadPicture {
+    margin-left: 20px;
+}
+
+p.charCounter {
+    margin-right: 20px;
+	font-size: 12px;
+}
+
+p.charCounterError {
+    margin-right: 20px;
+	color: red;
+	font-size: 12px;
+}
