@@ -2,31 +2,31 @@
 Author: 	Brayden Streibel
 Student #: 	200319344
 Class: 		CS 215-001
-URL: 		http://www2.cs.uregina.ca/~streibeb/a3/
+URL: 		http://www2.cs.uregina.ca/~streibeb/a4/index.php
 =====================================================================
 
 Files:
 =====================================================================
-img\pic.gif		Picture for image upload button
-img\star-active.gif	Picture for post "liking" feature, dark red
-img\star-hover.gif	Picture for post "liking" feature, light red
+img\default-user.png 	Default user picture
+img\pic.gif				Picture for image upload button
+img\star-active.gif		Picture for post "liking" feature, dark red
+img\star-hover.gif		Picture for post "liking" feature, light red
 img\star-inactive.gif	Picture for post "liking" feature, grey
 
-index.html		Index page of website
-indexr.js		Event registration for index.html
+scripts\indexr.js		Event registration for index.html
+scripts\loginr.js		Event registration for login.html
+scripts\postr.js		Event registration for post.html
+scripts\registerr.js	Event registration for register.html
+scripts\scripts.js		All JavaScript functions
+scripts\update.js		Event registration for update.js
 
-login.html		Login form
-loginr.js		Event registration for login.html
+uploads\				Directory for user uploads
 
-post.html		Post & comment display page
-postr.js		Event registration for post.html
-
-register.html		Account registration page
-registerr.js		Event registration for register.html
-
-scripts.js		All JavaScript functions
-
-style.css		Overall style of website
-
-update.html		Post submission form
-update.js		Event registration for update.js
+CreateStuff.sql			SQL commands to create my database tables
+ERD.jpg					Entity Relationship diagram
+index.php				Index page of website
+login.php				Login form
+post.php				Post & comment display page
+register.php			Account registration page
+style.css				Overall style of website
+update.php				Post submission form

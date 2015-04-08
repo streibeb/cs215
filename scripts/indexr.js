@@ -1,3 +1,9 @@
-document.getElementById("likeButton1").addEventListener("mouseup", likePost, false);
-document.getElementById("likeButton2").addEventListener("mouseup", likePost, false);
-document.getElementById("likeButton3").addEventListener("mouseup", likePost, false);
+window.addEventListener("load", init, false);
+
+var buttons = document.getElementsByTagName("button");
+
+for(var i = 0; i < buttons.length; i++) {
+    if (buttons[i].id.substr(0, 11) == "likeButton_") {
+        buttons[i].addEventListener("mouseup", LikePost, false);
+    }
+}

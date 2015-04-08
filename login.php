@@ -78,7 +78,7 @@ if (isset($_SESSION["uid"])) {
                         unset($_SESSION["error"]);
                         echo ("<p class=\"error\">$err</p>");
                     } ?>
-                    <input type="text" name="email" id="login-email" placeholder="Email" value="<?=$email?>"/>
+                    <input type="text" name="email" id="login-email" placeholder="Email" value="<?php if(isset($email)) $email?>"/>
                     <br/>
                     <input type="password" name="password" id="login-password" placeholder="Password" />
                     <br/>

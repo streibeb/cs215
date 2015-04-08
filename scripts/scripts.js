@@ -1,13 +1,3 @@
-function likePost(Event) {
-	var element = Event.currentTarget;
-	
-	if (element.className == "likeButton") {
-		element.className = "likeButtonPressed";
-	} else {
-		element.className = "likeButton";
-	}
-}
-
 function validateEmail(Event) {
 	var element = Event.currentTarget;
 	var elementVal = Event.currentTarget.value;

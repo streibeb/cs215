@@ -47,7 +47,7 @@ if (isset($_POST["submit"])) {
         $err = $err."Post is too short".PHP_EOL;
     }
 
-    if ($err != "") {
+    if ($err == "") {
         $db = mysqli_connect(DB_HOST_NAME, DB_USER, DB_PASS, DB_NAME);
         if (!$db) {
             die ("Failed to connect to database: " . mysqli_connect_error());
@@ -66,6 +66,7 @@ if (isset($_POST["submit"])) {
                     $result = mysqli_query($db, $query);
                     if (!$result) {
                         $err = "There was a problem uploading the image";
+
                     }
                 }
             }
@@ -73,6 +74,11 @@ if (isset($_POST["submit"])) {
             echo mysqli_error($db);
         }
         mysqli_close($db);
+        header("Location: index.php");
+        exit();
+    }
+    else {
+        echo $err;
     }
     $_SESSION["error"] = $err;
 }

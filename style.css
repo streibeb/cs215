@@ -172,6 +172,7 @@ header {
 	background-image: url("img/star-inactive.gif");
 	border: none;
 	background-color: white;
+    color: #AA0000;
 	margin-left: 10px;
 	width: 35px;
 	height: 35px;
@@ -181,9 +182,22 @@ header {
 	background-image: url("img/star-active.gif");
 	border: none;
 	background-color: white;
+    color: white;
 	margin-left: 10px;
 	width: 35px;
 	height: 35px;
+}
+
+.likeButtonLoading {
+    background-image: url("img/ajax-loader.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    color: transparent;
+    border: none;
+    background-color: white;
+    margin-left: 10px;
+    width: 35px;
+    height: 35px;
 }
 
 .postDate:hover {
@@ -216,6 +230,7 @@ header {
 .comment {
 	margin-top: 5px;
 	margin-left: 50px;
+    margin-bottom: 5px;
 }
 
 .commentProfile {

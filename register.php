@@ -80,9 +80,9 @@ if (isset($_POST["submit"])) {
                     unset($_SESSION["error"]);
                     echo ("<p class=\"error\">$err</p>");
                 }?>
-				<input type="text" id="register-fname" name="firstName" placeholder="First Name" value="<?=$firstName?>" />
+				<input type="text" id="register-fname" name="firstName" placeholder="First Name" value="<?php if(isset($firstName)) $firstName?>" />
 				<br/>
-				<input type="text" id="register-lname" name="lastName" placeholder="Last Name" value="<?=$lastName?>"/>
+				<input type="text" id="register-lname" name="lastName" placeholder="Last Name" value="<?php if (isset($lastName)) $lastName?>"/>
 				<br/>
 				<fieldset class="registerCenter">
 					<div class="left" id="registerDateOfBirth">
@@ -181,7 +181,7 @@ if (isset($_POST["submit"])) {
 					</div>
 				</fieldset>
 				<br/>
-				<input type="text" id="register-email" name="email" placeholder="Email" value=""<?=$email?>/>
+				<input type="text" id="register-email" name="email" placeholder="Email" value=""<?php if(isset($email)) $email?>/>
 				<br/>
 				<input type="password" id="register-password" name="password" placeholder="Password" />
 				<br/>
