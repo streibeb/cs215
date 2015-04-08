@@ -9,7 +9,9 @@ if (!$db) {
     die ("Failed to connect to database: " . mysqli_connect_error());
 }
 
-if (isset($_SESSION["uid"])) {
+$loggedIn = isset($_SESSION["uid"]);
+
+if ($loggedIn) {
     $uid = $_SESSION["uid"];
     $query = "SELECT Posts.*,
       Users.first_name,
@@ -54,7 +56,7 @@ mysqli_close($db);
 			<a class="siteLogo" href="index.php">updatr</a>
 			<div class="account">
 				<img class="accountImage" src="img/default-user.png" alt="Profile"/>
-                <?php if(isset($_SESSION["uid"])) {
+                <?php if($loggedIn) {
                     $first_name = $_SESSION["first_name"];
                     echo "<a class=\"accountText\" href=\"login.php\">Logout $first_name</a>";
                 } else {
@@ -64,7 +66,7 @@ mysqli_close($db);
 		</div>
 	</header>
 	<div class="content50Percent">
-        <?php if(isset($_SESSION["uid"])): ?>
+        <?php if($loggedIn): ?>
             <form action="update.php">
 			    <fieldset><input class="postUpdate" type="submit" value="Post an Update"/></fieldset>
 		    </form>
@@ -110,5 +112,6 @@ mysqli_close($db);
 		&copy; Brayden Streibel 2015
 	</footer>
 </body>
-<script type="text/javascript" src="scripts/indexr.js"></script>
+<?php if ($loggedIn) { ?><script type="text/javascript" src="scripts/indexr.js"></script><?php } ?>
+<script type="text/javascript" src="scripts/ajaxr.js"></script>
 </html>

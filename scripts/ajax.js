@@ -24,7 +24,8 @@ function LikePost(Event) {
     var xhr = GetRequestObject();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 1) {
-            element.className += " likeButtonLoading"
+            element.className += " likeButtonLoading";
+            element.removeEventListener("mouseup", LikePost, true);
         }
         if (xhr.readyState == 4 && xhr.status == 200) {
             var responseObj = JSON.parse(xhr.responseText);
@@ -36,6 +37,7 @@ function LikePost(Event) {
             }
             element.innerHTML = "";
             element.innerHTML = responseObj[0].numLikes;
+            element.addEventListener("mouseup", LikePost, true);
         }
     }
     xhr.open("POST","likes.php",true);
