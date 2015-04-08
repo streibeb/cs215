@@ -64,6 +64,8 @@ function RefreshPosts() {
             for (var i = 0; i < responseObj.length; i++) {
                 AddPost(responseObj[i]);
             }
+            // Add removal of posts here
+            // Update posts here
             if (responseObj.length > 0) lastUpdate = new Date();
         }
     }
