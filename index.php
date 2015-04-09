@@ -10,39 +10,43 @@ if (!$db) {
 }
 
 $loggedIn = isset($_SESSION["uid"]);
+
+$query = "SELECT COUNT(pid) as 'count' FROM Posts;";
+$result = mysqli_query($db, $query);
+$totalPages = 0;
+if ($r = mysqli_fetch_assoc($result)){
+    $totalPages = ceil($r["count"]/POSTS_PER_PAGE);
+}
 $postsPerPage = POSTS_PER_PAGE;
 
-if ($loggedIn) {
-    $uid = $_SESSION["uid"];
-    $query = "SELECT Posts.*,
-      Users.first_name,
-      Users.last_name,
-      COUNT(Comments.cid) as 'numComments',
-      COUNT(Likes.pid) as 'numLikes',
-      (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
-    FROM Posts
-      JOIN Users ON Posts.uid = Users.uid
-      LEFT JOIN Comments ON Posts.pid = Comments.pid
-      LEFT JOIN Likes ON Posts.pid = Likes.pid
-    WHERE Posts.timestamp >= '$updateTime'
-    GROUP BY Posts.timestamp
-    ORDER BY Posts.timestamp DESC
-    LIMIT 0, $postsPerPage;";
+$pageBegin = 0;
+if (isset($_GET["page"])) {
+    $pageNum = $_GET["page"];
+    if ($pageNum == 0) {
+        $pageNum = 1;
+    } else if ($pageNum > $totalPages) {
+        $pageNum = $totalPages;
+    }
+    $pageBegin = ($pageNum-1) * 10;
+    $_SESSION["currentPage"] = $pageNum;
 } else {
-    $query = "SELECT Posts.*,
-      Users.first_name,
-      Users.last_name,
-      COUNT(Comments.cid) as 'numComments',
-      COUNT(Likes.pid) as 'numLikes'
-    FROM Posts
-      JOIN Users ON Posts.uid = Users.uid
-      LEFT JOIN Comments ON Posts.pid = Comments.pid
-      LEFT JOIN Likes ON Posts.pid = Likes.pid
-    WHERE Posts.timestamp >= '$updateTime'
-    GROUP BY Posts.timestamp
-    ORDER BY Posts.timestamp DESC
-    LIMIT 0, $postsPerPage;";
+    $_SESSION["currentPage"] = 1;
 }
+
+$uid = $_SESSION["uid"];
+$query = "SELECT Posts.*,
+  Users.first_name,
+  Users.last_name,
+  COUNT(Comments.cid) as 'numComments',
+  COUNT(Likes.pid) as 'numLikes',
+  (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
+FROM Posts
+  JOIN Users ON Posts.uid = Users.uid
+  LEFT JOIN Comments ON Posts.pid = Comments.pid
+  LEFT JOIN Likes ON Posts.pid = Likes.pid
+GROUP BY Posts.timestamp
+ORDER BY Posts.timestamp DESC
+LIMIT $pageBegin, $postsPerPage;";
 
 $result = mysqli_query($db, $query);
 if (mysqli_num_rows($result) == 0) {
@@ -115,6 +119,15 @@ mysqli_close($db);
                 </div>
             </div>
         <?php } ?>
+        </div>
+        <div class="center">
+            <?php if ($pageNum > 1) { ?>
+                <a href="index.php?page=<?=$pageNum-1?>"><button id="lastPage" class="nav">&lt;&lt;</button></a>
+            <?php } ?>
+            <span id="pageIndicator"><?=$pageNum?></span>
+            <?php if ($pageNum < $totalPages) { ?>
+                <a href="index.php?page=<?=$pageNum+1?>"><button id="nextPage" class="nav">&gt;&gt;</button></a>
+            <?php } ?>
         </div>
 	</div>
 	<footer>

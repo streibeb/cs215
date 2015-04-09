@@ -54,7 +54,7 @@ var isUpdating;
 var updateTimer;
 
 function init() {
-    lastUpdate = new Date();
+    lastUpdate = Date.now();
     isUpdating = true;
     updateTimer = setInterval(function(){RefreshPosts()}, 10000); //refresh every 10s
 }
@@ -74,47 +74,60 @@ function RefreshPosts() {
     var xhr = GetRequestObject();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
+            lastUpdate = Date.now();
             var responseObj = JSON.parse(xhr.responseText);
 
-            for (var i = 0; i < responseObj.add.length; i++) {
+            for (var i = responseObj.add.length-1; i >= 0; i--) {
                 AddPost(document, responseObj.add[i]);
             }
 
             var postContainer = document.getElementById("PostContainer");
-            for (var i = postContainer.children.length; i > 10; i--) {
+            for (var i = postContainer.children.length-1; i >= 10; i--) {
                 postContainer.removeChild(postContainer.lastElementChild);
             }
 
             for (var i = 0; i < responseObj.update.length; i++) {
                 UpdatePost(document, responseObj.update[i])
             }
-            lastUpdate = new Date();
         }
     }
-    var url = "getPosts.php?updateTime="+(lastUpdate.valueOf()/1000);
+    var url = "getPosts.php?updateTime="+Math.floor(lastUpdate/1000);
     xhr.open("GET", url, true);
     xhr.send();
 }
 
-function UpdatePost(document, post) {
-    var likeButton = document.getElementById("likeButton_"+post.pid);
+function PingServer() {
+    var xhr = GetRequestObject();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            console.log(xhr.responseText);
+            lastUpdate = new Date();
+        }
+    }
+    var url = "getTime.php?t="+Math.floor(lastUpdate/1000);
+    xhr.open("GET", url, true);
+    xhr.send();
+}
+
+function UpdatePost(doc, post) {
+    var likeButton = doc.getElementById("likeButton_"+post.pid);
     likeButton.className = post.userLiked ? "likeButtonPressed" : "likeButton";
     likeButton.innerHTML = post.numLikes;
 
-    var commentIndicator = document.getElementById("commentIndicator_"+post.pid);
+    var commentIndicator = doc.getElementById("commentIndicator_"+post.pid);
     var commentValue = post.numComments == 1 ? " Comment" : " Comments";
     commentIndicator.innerHTML = post.numComments + commentValue;
 }
 
-function AddPost(document, post) {
-    var postContainer = document.getElementById("PostContainer");
+function AddPost(doc, post) {
+    var postContainer = doc.getElementById("PostContainer");
 
-    var postDiv = document.createElement("div");
+    var postDiv = doc.createElement("div");
     postDiv.className = "post";
     postDiv.id = "post_"+post.pid;
     postContainer.insertBefore(postDiv, postContainer.childNodes[0]);
 
-    var br = document.createElement("br");
+    var br = doc.createElement("br");
 
     var postProfileDiv = CreateDiv("postProfile", postDiv);
         var postProfileImg = CreateImg("postProfileImage", "img/default-user.png", "Profile", postProfileDiv);

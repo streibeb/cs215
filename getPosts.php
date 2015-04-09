@@ -13,8 +13,10 @@ if (isset($_GET["updateTime"])) {
     $updateTime = date("Y-m-d H:i:s", "0");
 }
 
-if (isset($_GET["page"])) {
-    $page = ($_GET["page"] * 10)-1;
+$pageBegin = 0;
+if (isset($_SESSION["currentPage"])) {
+    $page = $_SESSION["currentPage"];
+    $pageBegin = ($page-1) * 10;
 } else  {
     $page = 0;
 }
@@ -28,43 +30,26 @@ if ($r = mysqli_fetch_assoc($result)){
     $totalPages = ceil($r["count"]/POSTS_PER_PAGE);
 }
 $postsPerPage = POSTS_PER_PAGE;
-$sResp = array("pages" => $totalPages,"add" => array(), "update" => array());
+$sResp = array("page" => $page, "totalPages" => $totalPages,"add" => array(), "update" => array());
 
 // Get new posts
-if ($loggedIn) {
-    $uid = $_SESSION["uid"];
-    $query = "SELECT Posts.*,
-      Users.first_name,
-      Users.last_name,
-      COUNT(Comments.cid) as 'numComments',
-      COUNT(Likes.pid) as 'numLikes',
-      (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
-    FROM Posts
-      JOIN Users ON Posts.uid = Users.uid
-      LEFT JOIN Comments ON Posts.pid = Comments.pid
-      LEFT JOIN Likes ON Posts.pid = Likes.pid
-    WHERE Posts.timestamp >= '$updateTime'
-    GROUP BY Posts.timestamp
-    ORDER BY Posts.timestamp
-    LIMIT $page, $postsPerPage;";
-} else {
-    $query = "SELECT Posts.*,
-      Users.first_name,
-      Users.last_name,
-      COUNT(Comments.cid) as 'numComments',
-      COUNT(Likes.pid) as 'numLikes'
-    FROM Posts
-      JOIN Users ON Posts.uid = Users.uid
-      LEFT JOIN Comments ON Posts.pid = Comments.pid
-      LEFT JOIN Likes ON Posts.pid = Likes.pid
-    WHERE Posts.timestamp >= '$updateTime'
-    GROUP BY Posts.timestamp
-    ORDER BY Posts.timestamp
-    LIMIT $page, $postsPerPage;";
-}
+$uid = $_SESSION["uid"];
+$query = "SELECT Posts.*,
+  Users.first_name,
+  Users.last_name,
+  COUNT(Comments.cid) as 'numComments',
+  COUNT(Likes.pid) as 'numLikes',
+  (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
+FROM Posts
+  JOIN Users ON Posts.uid = Users.uid
+  LEFT JOIN Comments ON Posts.pid = Comments.pid
+  LEFT JOIN Likes ON Posts.pid = Likes.pid
+WHERE Posts.timestamp >= '$updateTime'
+GROUP BY Posts.timestamp
+ORDER BY Posts.timestamp DESC
+LIMIT $pageBegin, $postsPerPage;";
 
 $result = mysqli_query($db, $query);
-echo mysqli_error($db);
 while ($row = mysqli_fetch_assoc($result)) {
     $sRow["pid"] = $row["pid"];
     $sRow["timestamp"] = $row["timestamp"];
@@ -79,29 +64,16 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 // Get likes for posts on page
-if ($loggedIn) {
-    $uid = $_SESSION["uid"];
-    $query = "SELECT Posts.pid,
-       COUNT(Comments.cid) as 'numComments',
-       COUNT(Likes.pid) as 'numLikes',
-       (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
-     FROM Posts
-     JOIN Users ON Posts.uid = Users.uid
-     LEFT JOIN Comments ON Posts.pid = Comments.pid
-     LEFT JOIN Likes ON Posts.pid = Likes.pid
-     WHERE Posts.pid IN (SELECT * FROM (SELECT pid FROM Posts ORDER BY timestamp desc limit $page, $postsPerPage) as t)
-     GROUP BY Posts.timestamp;";
-} else {
-    $query = "SELECT Posts.pid,
-       COUNT(Comments.cid) as 'numComments',
-       COUNT(Likes.pid) as 'numLikes'
-     FROM Posts
-       JOIN Users ON Posts.uid = Users.uid
-       LEFT JOIN Comments ON Posts.pid = Comments.pid
-       LEFT JOIN Likes ON Posts.pid = Likes.pid
-     WHERE Posts.pid IN (SELECT * FROM (SELECT pid FROM Posts ORDER BY timestamp desc limit $page, $postsPerPage) as t)
-     GROUP BY Posts.timestamp;";
-}
+$query = "SELECT Posts.pid,
+   COUNT(Comments.cid) as 'numComments',
+   COUNT(Likes.pid) as 'numLikes',
+   (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
+ FROM Posts
+ JOIN Users ON Posts.uid = Users.uid
+ LEFT JOIN Comments ON Posts.pid = Comments.pid
+ LEFT JOIN Likes ON Posts.pid = Likes.pid
+ WHERE Posts.pid IN (SELECT * FROM (SELECT pid FROM Posts ORDER BY timestamp DESC LIMIT $pageBegin, $postsPerPage) as t)
+ GROUP BY Posts.timestamp;";
 
 $result = mysqli_query($db, $query);
 while ($row = mysqli_fetch_assoc($result)) {
