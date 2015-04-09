@@ -53,10 +53,16 @@ var lastUpdate;
 var isUpdating;
 var updateTimer;
 
-function init() {
+function initPosts() {
     lastUpdate = Date.now();
     isUpdating = true;
     updateTimer = setInterval(function(){RefreshPosts()}, 10000); //refresh every 10s
+}
+
+function initComments() {
+    lastUpdate = Date.now();
+    isUpdating = true;
+    updateTimer = setInterval(function(){RefreshComments()}, 10000); //refresh every 10s
 }
 
 function AjaxToggle() {
@@ -89,9 +95,41 @@ function RefreshPosts() {
             for (var i = 0; i < responseObj.update.length; i++) {
                 UpdatePost(document, responseObj.update[i])
             }
+
+            updateTimer = Date().now;
         }
     }
     var url = "getPosts.php?updateTime="+Math.floor(lastUpdate/1000);
+    xhr.open("GET", url, true);
+    xhr.send();
+}
+
+function RefreshComments() {
+    var xhr = GetRequestObject();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            lastUpdate = Date.now();
+            var responseObj = JSON.parse(xhr.responseText);
+
+            for (var i = responseObj.comments.length-1; i >= 0; i--) {
+                AddComment(document, responseObj.comments[i]);
+            }
+
+            for (var i = 0; i < responseObj.post.length; i++) {
+                var likeButton = document.getElementById("likeButton_"+responseObj.post[i].pid);
+                likeButton.className = responseObj.update[i].userLiked ? "likeButtonPressed" : "likeButton";
+                likeButton.innerHTML = responseObj.update[i].numLikes;
+            }
+
+            updateTimer = Date().now;
+        }
+    }
+    var post = document.getElementsByClassName("post");
+    var pid;
+    for(var i = 0; i < post.length; i++) {
+        pid = post[i].id.substring(5);
+    }
+    var url = "getComments.php?pid="+pid+"&updateTime="+Math.floor(lastUpdate/1000);
     xhr.open("GET", url, true);
     xhr.send();
 }
@@ -101,7 +139,7 @@ function PingServer() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
             console.log(xhr.responseText);
-            lastUpdate = new Date();
+            updateTimer = Date().now;
         }
     }
     var url = "getTime.php?t="+Math.floor(lastUpdate/1000);
@@ -151,6 +189,34 @@ function AddPost(doc, post) {
         if (post.image != null) {
             var PostImage = CreateImg("postImage", stripslashes(post.image), "UserPic", postAreaDiv);
         }
+}
+
+function AddComment(doc, comment) {
+    var commentContainer = doc.getElementById("commentContainer");
+
+    var eExists = document.getElementById("comment_"+comment.pid);
+    if (eExists != null) return;
+
+    var commentDiv = doc.createElement("div");
+    commentDiv.className = "comment";
+    commentDiv.id = "comment_"+comment.pid;
+    commentContainer.appendChild(commentDiv);
+
+    var br = doc.createElement("br");
+
+    var commentProfileDiv = CreateDiv("commentProfile", commentDiv);
+    var commentProfileImg = CreateImg("commentProfileImage", "img/default-user.png", "Profile", commentProfileDiv);
+    var commentProfileNameDiv = CreateDiv("commentProfileName", commentProfileDiv).innerHTML = comment.first_name + " " + comment.last_name;
+    var commentProfileInfoDiv = CreateDiv("postProfileInfo", commentProfileDiv);
+    var commentProfileInfoDiv2 = CreateDiv("right", commentProfileDiv);
+    var commentDate = CreateSpan("postDate", commentProfileInfoDiv2).innerHTML = comment.timestamp;
+    commentProfileInfoDiv2.appendChild(br);
+
+    var commentAreaDiv = CreateDiv("commentArea", commentDiv);
+    var commentContent = CreateParagraph(comment.content, commentAreaDiv);
+    if (comment.image != null) {
+        var commentImage = CreateImg("postImage", stripslashes(comment.image), "UserPic", commentAreaDiv);
+    }
 }
 
 function CreateDiv(className, parent)

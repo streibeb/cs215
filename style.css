@@ -20,6 +20,10 @@ footer {
     margin-right: auto;
 }
 
+.centerText {
+    text-align: center;
+}
+
 .left {
 	float: left;
 }
@@ -267,7 +271,7 @@ header {
 
 .makeComment {
 	margin-top: 5px;
-	margin-left: 50px;
+	/*margin-left: 50px;*/
 	background-color: white;
 }
 
@@ -397,11 +401,13 @@ p.charCounterError {
 #pageIndicator {
     margin-left: 10px;
     margin-right: 10px;
+    text-align: center;
 }
 
 #ajaxToggle {
     text-decoration: underline;
     color: #AA0000;
+    text-align: center;
 }
 
 #ajaxToggle:hover {

@@ -31,19 +31,18 @@ if (isset($_GET["page"])) {
     $_SESSION["currentPage"] = $pageNum;
 } else {
     $_SESSION["currentPage"] = 1;
+    $pageNum = 1;
 }
 
 $uid = $_SESSION["uid"];
 $query = "SELECT Posts.*,
   Users.first_name,
   Users.last_name,
-  COUNT(Comments.cid) as 'numComments',
-  COUNT(Likes.pid) as 'numLikes',
+  (SELECT COUNT(1) FROM Comments WHERE Posts.pid = Comments.pid) as 'numComments',
+  (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) as 'numLikes',
   (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
 FROM Posts
   JOIN Users ON Posts.uid = Users.uid
-  LEFT JOIN Comments ON Posts.pid = Comments.pid
-  LEFT JOIN Likes ON Posts.pid = Likes.pid
 GROUP BY Posts.timestamp
 ORDER BY Posts.timestamp DESC
 LIMIT $pageBegin, $postsPerPage;";
@@ -52,6 +51,7 @@ $result = mysqli_query($db, $query);
 if (mysqli_num_rows($result) == 0) {
     $err = "There was a problem retrieving posts";
 }
+echo mysqli_error($db);
 mysqli_close($db);
 ?>
 
@@ -120,7 +120,7 @@ mysqli_close($db);
             </div>
         <?php } ?>
         </div>
-        <div class="center">
+        <div class="center centerText">
             <?php if ($pageNum > 1) { ?>
                 <a href="index.php?page=<?=$pageNum-1?>"><button id="lastPage" class="nav">&lt;&lt;</button></a>
             <?php } ?>
@@ -128,14 +128,15 @@ mysqli_close($db);
             <?php if ($pageNum < $totalPages) { ?>
                 <a href="index.php?page=<?=$pageNum+1?>"><button id="nextPage" class="nav">&gt;&gt;</button></a>
             <?php } ?>
+            <br/>
+            <span id="ajaxToggle">Auto-Update Enabled</span>
         </div>
 	</div>
 	<footer>
-        <span id="ajaxToggle">Auto-Update Enabled</span>
 		<hr/>
 		&copy; Brayden Streibel 2015
 	</footer>
 </body>
 <?php if ($loggedIn) { ?><script type="text/javascript" src="scripts/indexr.js"></script><?php } ?>
-<script type="text/javascript" src="scripts/ajaxr.js"></script>
+<script type="text/javascript" src="scripts/index_ajaxr.js"></script>
 </html>

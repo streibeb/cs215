@@ -37,8 +37,8 @@ $uid = $_SESSION["uid"];
 $query = "SELECT Posts.*,
   Users.first_name,
   Users.last_name,
-  COUNT(Comments.cid) as 'numComments',
-  COUNT(Likes.pid) as 'numLikes',
+  (SELECT COUNT(1) FROM Comments WHERE Posts.pid = Comments.pid) as 'numComments',
+  (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) as 'numLikes',
   (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
 FROM Posts
   JOIN Users ON Posts.uid = Users.uid
@@ -50,6 +50,7 @@ ORDER BY Posts.timestamp DESC
 LIMIT $pageBegin, $postsPerPage;";
 
 $result = mysqli_query($db, $query);
+echo mysqli_error($db);
 while ($row = mysqli_fetch_assoc($result)) {
     $sRow["pid"] = $row["pid"];
     $sRow["timestamp"] = $row["timestamp"];
@@ -65,13 +66,11 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 // Get likes for posts on page
 $query = "SELECT Posts.pid,
-   COUNT(Comments.cid) as 'numComments',
-   COUNT(Likes.pid) as 'numLikes',
+   (SELECT COUNT(1) FROM Comments WHERE Posts.pid = Comments.pid) as 'numComments',
+   (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) as 'numLikes',
    (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
  FROM Posts
  JOIN Users ON Posts.uid = Users.uid
- LEFT JOIN Comments ON Posts.pid = Comments.pid
- LEFT JOIN Likes ON Posts.pid = Likes.pid
  WHERE Posts.pid IN (SELECT * FROM (SELECT pid FROM Posts ORDER BY timestamp DESC LIMIT $pageBegin, $postsPerPage) as t)
  GROUP BY Posts.timestamp;";
 
@@ -83,6 +82,5 @@ while ($row = mysqli_fetch_assoc($result)) {
     $sRow["userLiked"] = $row["userLiked"] ? true : false;
     $sResp["update"][] = $sRow;
 }
-
 echo json_encode($sResp);
 mysqli_close($db);
