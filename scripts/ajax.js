@@ -117,8 +117,8 @@ function RefreshComments() {
 
             for (var i = 0; i < responseObj.post.length; i++) {
                 var likeButton = document.getElementById("likeButton_"+responseObj.post[i].pid);
-                likeButton.className = responseObj.update[i].userLiked ? "likeButtonPressed" : "likeButton";
-                likeButton.innerHTML = responseObj.update[i].numLikes;
+                likeButton.className = responseObj.post[i].userLiked ? "likeButtonPressed" : "likeButton";
+                likeButton.innerHTML = responseObj.post[i].numLikes;
             }
 
             updateTimer = Date().now;

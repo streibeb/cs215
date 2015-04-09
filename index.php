@@ -34,7 +34,7 @@ if (isset($_GET["page"])) {
     $pageNum = 1;
 }
 
-$uid = $_SESSION["uid"];
+$uid = $loggedIn ? $_SESSION["uid"] : 0;
 $query = "SELECT Posts.*,
   Users.first_name,
   Users.last_name,

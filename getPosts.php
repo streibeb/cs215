@@ -33,7 +33,7 @@ $postsPerPage = POSTS_PER_PAGE;
 $sResp = array("page" => $page, "totalPages" => $totalPages,"add" => array(), "update" => array());
 
 // Get new posts
-$uid = $_SESSION["uid"];
+$uid = $loggedIn ? $_SESSION["uid"] : 0;
 $query = "SELECT Posts.*,
   Users.first_name,
   Users.last_name,

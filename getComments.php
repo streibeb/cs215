@@ -18,7 +18,7 @@ $loggedIn = isset($_SESSION["uid"]);
 $sResp = array("post" => array(), "comments" => array());
 
 // Get new comments
-$uid = $_SESSION["uid"];
+$uid = $loggedIn ? $_SESSION["uid"] : 0;
 $pid = $_GET["pid"];
 $query = "SELECT Comments.*,
   Users.first_name,
