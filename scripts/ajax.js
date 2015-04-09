@@ -50,10 +50,24 @@ function LikePost(Event) {
 }
 
 var lastUpdate;
+var isUpdating;
+var updateTimer;
 
 function init() {
     lastUpdate = new Date();
-    setInterval(function(){RefreshPosts()}, 10000); //refresh every 10s
+    isUpdating = true;
+    updateTimer = setInterval(function(){RefreshPosts()}, 10000); //refresh every 10s
+}
+
+function AjaxToggle() {
+    if (isUpdating) {
+        clearInterval(updateTimer)
+        document.getElementById("ajaxToggle").innerHTML = "Auto-Update Disabled";
+    } else {
+        document.getElementById("ajaxToggle").innerHTML = "Auto-Update Enabled";
+        updateTimer = setInterval(function(){RefreshPosts()}, 10000); //refresh every 10s
+    }
+    isUpdating = !isUpdating;
 }
 
 function RefreshPosts() {
@@ -61,19 +75,38 @@ function RefreshPosts() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
             var responseObj = JSON.parse(xhr.responseText);
-            for (var i = 0; i < responseObj.length; i++) {
-                AddPost(responseObj[i]);
+
+            for (var i = 0; i < responseObj.add.length; i++) {
+                AddPost(document, responseObj.add[i]);
             }
-            // Add removal of posts here
-            // Update posts here
-            if (responseObj.length > 0) lastUpdate = new Date();
+
+            var postContainer = document.getElementById("PostContainer");
+            for (var i = postContainer.children.length; i > 10; i--) {
+                postContainer.removeChild(postContainer.lastElementChild);
+            }
+
+            for (var i = 0; i < responseObj.update.length; i++) {
+                UpdatePost(document, responseObj.update[i])
+            }
+            lastUpdate = new Date();
         }
     }
-    xhr.open("GET", "getPosts.php?updateTime="+(lastUpdate.valueOf()/1000), true);
+    var url = "getPosts.php?updateTime="+(lastUpdate.valueOf()/1000);
+    xhr.open("GET", url, true);
     xhr.send();
 }
 
-function AddPost(post) {
+function UpdatePost(document, post) {
+    var likeButton = document.getElementById("likeButton_"+post.pid);
+    likeButton.className = post.userLiked ? "likeButtonPressed" : "likeButton";
+    likeButton.innerHTML = post.numLikes;
+
+    var commentIndicator = document.getElementById("commentIndicator_"+post.pid);
+    var commentValue = post.numComments == 1 ? " Comment" : " Comments";
+    commentIndicator.innerHTML = post.numComments + commentValue;
+}
+
+function AddPost(document, post) {
     var postContainer = document.getElementById("PostContainer");
 
     var postDiv = document.createElement("div");
@@ -90,13 +123,15 @@ function AddPost(post) {
         var postProfileInfoDiv1 = CreateDiv("right", postProfileDiv);
             var likeButtonClass = post.userLiked ? "likeButtonPressed" : "likeButton";
             var likeButton = CreateButton(likeButtonClass, "likeButton_"+post.pid, postProfileInfoDiv1);
-            likeButton.innerHTML = post.numLikes;
-            likeButton.addEventListener("mouseup", LikePost, false);
+                likeButton.innerHTML = post.numLikes;
+                likeButton.addEventListener("mouseup", LikePost, false);
         var postProfileInfoDiv2 = CreateDiv("right", postProfileDiv);
             var postDate = CreateSpan("postDate", postProfileInfoDiv2).innerHTML = post.timestamp;
-            postProfileInfoDiv2.appendChild(br);
+                postProfileInfoDiv2.appendChild(br);
             var commentValue = post.numComments == 1 ? " Comment" : " Comments";
-            var postCommentIndicator = CreateLink("commentIndicator", "post.php?pid="+post.pid, postProfileInfoDiv2).innerHTML = post.numComments + commentValue;
+            var postCommentIndicator = CreateLink("commentIndicator", "post.php?pid="+post.pid, postProfileInfoDiv2)
+                postCommentIndicator.id = "commentIndicator_"+post.pid;
+                postCommentIndicator.innerHTML = post.numComments + commentValue;
 
     var postAreaDiv = CreateDiv("postArea", postDiv);
         var PostContent = CreateParagraph(post.content, postAreaDiv);

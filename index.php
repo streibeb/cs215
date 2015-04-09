@@ -10,30 +10,40 @@ if (!$db) {
 }
 
 $loggedIn = isset($_SESSION["uid"]);
+$postsPerPage = POSTS_PER_PAGE;
 
 if ($loggedIn) {
     $uid = $_SESSION["uid"];
     $query = "SELECT Posts.*,
       Users.first_name,
       Users.last_name,
-      (SELECT COUNT(Comments.cid) FROM Comments WHERE Posts.pid = Comments.pid) AS 'numComments',
-      (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) AS 'numLikes',
-      (SELECT 1 FROM Likes WHERE Posts.pid = Likes.pid AND Likes.uid = '$uid') AS 'userLiked'
+      COUNT(Comments.cid) as 'numComments',
+      COUNT(Likes.pid) as 'numLikes',
+      (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
     FROM Posts
-    JOIN Users ON Posts.uid = Users.uid
-    ORDER BY Posts.pid
-    DESC LIMIT 10";
+      JOIN Users ON Posts.uid = Users.uid
+      LEFT JOIN Comments ON Posts.pid = Comments.pid
+      LEFT JOIN Likes ON Posts.pid = Likes.pid
+    WHERE Posts.timestamp >= '$updateTime'
+    GROUP BY Posts.timestamp
+    ORDER BY Posts.timestamp DESC
+    LIMIT 0, $postsPerPage;";
 } else {
     $query = "SELECT Posts.*,
       Users.first_name,
       Users.last_name,
-      (SELECT COUNT(Comments.cid) FROM Comments WHERE Posts.pid = Comments.pid) AS 'numComments',
-      (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) AS 'numLikes'
+      COUNT(Comments.cid) as 'numComments',
+      COUNT(Likes.pid) as 'numLikes'
     FROM Posts
-    JOIN Users ON Posts.uid = Users.uid
-    ORDER BY Posts.pid
-    DESC LIMIT 10";
+      JOIN Users ON Posts.uid = Users.uid
+      LEFT JOIN Comments ON Posts.pid = Comments.pid
+      LEFT JOIN Likes ON Posts.pid = Likes.pid
+    WHERE Posts.timestamp >= '$updateTime'
+    GROUP BY Posts.timestamp
+    ORDER BY Posts.timestamp DESC
+    LIMIT 0, $postsPerPage;";
 }
+
 $result = mysqli_query($db, $query);
 if (mysqli_num_rows($result) == 0) {
     $err = "There was a problem retrieving posts";
@@ -85,7 +95,7 @@ mysqli_close($db);
                         <div class="right">
                             <span class="postDate"><?php echo $post["timestamp"];?></span>
                             <br/>
-                            <a class="commentIndicator" href="<?php echo "post.php?pid=".$post["pid"];?>">
+                            <a id="commentIndicator_<?=$post["pid"]?>" class="commentIndicator" href="<?php echo "post.php?pid=".$post["pid"];?>">
                                 <?php echo $post["numComments"];
                                 if ($post["numComments"] != 1) {?>
                                     Comments
@@ -108,6 +118,7 @@ mysqli_close($db);
         </div>
 	</div>
 	<footer>
+        <span id="ajaxToggle">Auto-Update Enabled</span>
 		<hr/>
 		&copy; Brayden Streibel 2015
 	</footer>

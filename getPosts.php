@@ -13,31 +13,58 @@ if (isset($_GET["updateTime"])) {
     $updateTime = date("Y-m-d H:i:s", "0");
 }
 
-if (isset($_SESSION["uid"])) {
+if (isset($_GET["page"])) {
+    $page = ($_GET["page"] * 10)-1;
+} else  {
+    $page = 0;
+}
+
+$loggedIn = isset($_SESSION["uid"]);
+
+$query = "SELECT COUNT(pid) as 'count' FROM Posts;";
+$result = mysqli_query($db, $query);
+$totalPages = 0;
+if ($r = mysqli_fetch_assoc($result)){
+    $totalPages = ceil($r["count"]/POSTS_PER_PAGE);
+}
+$postsPerPage = POSTS_PER_PAGE;
+$sResp = array("pages" => $totalPages,"add" => array(), "update" => array());
+
+// Get new posts
+if ($loggedIn) {
     $uid = $_SESSION["uid"];
     $query = "SELECT Posts.*,
       Users.first_name,
       Users.last_name,
-      (SELECT COUNT(Comments.cid) FROM Comments WHERE Posts.pid = Comments.pid) AS 'numComments',
-      (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) AS 'numLikes',
-      (SELECT 1 FROM Likes WHERE Posts.pid = Likes.pid AND Likes.uid = '$uid') AS 'userLiked'
+      COUNT(Comments.cid) as 'numComments',
+      COUNT(Likes.pid) as 'numLikes',
+      (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
     FROM Posts
-    JOIN Users ON Posts.uid = Users.uid
+      JOIN Users ON Posts.uid = Users.uid
+      LEFT JOIN Comments ON Posts.pid = Comments.pid
+      LEFT JOIN Likes ON Posts.pid = Likes.pid
     WHERE Posts.timestamp >= '$updateTime'
-    ORDER BY Posts.pid";
+    GROUP BY Posts.timestamp
+    ORDER BY Posts.timestamp
+    LIMIT $page, $postsPerPage;";
 } else {
     $query = "SELECT Posts.*,
       Users.first_name,
       Users.last_name,
-      (SELECT COUNT(Comments.cid) FROM Comments WHERE Posts.pid = Comments.pid) AS 'numComments',
-      (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) AS 'numLikes'
+      COUNT(Comments.cid) as 'numComments',
+      COUNT(Likes.pid) as 'numLikes'
     FROM Posts
-    JOIN Users ON Posts.uid = Users.uid
+      JOIN Users ON Posts.uid = Users.uid
+      LEFT JOIN Comments ON Posts.pid = Comments.pid
+      LEFT JOIN Likes ON Posts.pid = Likes.pid
     WHERE Posts.timestamp >= '$updateTime'
-    ORDER BY Posts.pid";
+    GROUP BY Posts.timestamp
+    ORDER BY Posts.timestamp
+    LIMIT $page, $postsPerPage;";
 }
+
 $result = mysqli_query($db, $query);
-$sResp = array();
+echo mysqli_error($db);
 while ($row = mysqli_fetch_assoc($result)) {
     $sRow["pid"] = $row["pid"];
     $sRow["timestamp"] = $row["timestamp"];
@@ -48,7 +75,42 @@ while ($row = mysqli_fetch_assoc($result)) {
     $sRow["numComments"] = $row["numComments"];
     $sRow["numLikes"] = $row["numLikes"];
     $sRow["userLiked"] = $row["userLiked"] ? true : false;
-    $sResp[] = $sRow;
+    $sResp["add"][] = $sRow;
 }
+
+// Get likes for posts on page
+if ($loggedIn) {
+    $uid = $_SESSION["uid"];
+    $query = "SELECT Posts.pid,
+       COUNT(Comments.cid) as 'numComments',
+       COUNT(Likes.pid) as 'numLikes',
+       (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
+     FROM Posts
+     JOIN Users ON Posts.uid = Users.uid
+     LEFT JOIN Comments ON Posts.pid = Comments.pid
+     LEFT JOIN Likes ON Posts.pid = Likes.pid
+     WHERE Posts.pid IN (SELECT * FROM (SELECT pid FROM Posts ORDER BY timestamp desc limit $page, $postsPerPage) as t)
+     GROUP BY Posts.timestamp;";
+} else {
+    $query = "SELECT Posts.pid,
+       COUNT(Comments.cid) as 'numComments',
+       COUNT(Likes.pid) as 'numLikes'
+     FROM Posts
+       JOIN Users ON Posts.uid = Users.uid
+       LEFT JOIN Comments ON Posts.pid = Comments.pid
+       LEFT JOIN Likes ON Posts.pid = Likes.pid
+     WHERE Posts.pid IN (SELECT * FROM (SELECT pid FROM Posts ORDER BY timestamp desc limit $page, $postsPerPage) as t)
+     GROUP BY Posts.timestamp;";
+}
+
+$result = mysqli_query($db, $query);
+while ($row = mysqli_fetch_assoc($result)) {
+    $sRow["pid"] = $row["pid"];
+    $sRow["numComments"] = $row["numComments"];
+    $sRow["numLikes"] = $row["numLikes"];
+    $sRow["userLiked"] = $row["userLiked"] ? true : false;
+    $sResp["update"][] = $sRow;
+}
+
 echo json_encode($sResp);
 mysqli_close($db);

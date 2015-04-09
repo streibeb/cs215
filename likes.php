@@ -12,7 +12,8 @@ if (isset($_SESSION["uid"])) {
         if (!$db) {
             die ("Failed to connect to database: " . mysqli_connect_error());
         }
-        $query = "INSERT INTO Likes (pid, uid) VALUES ('$pid','$uid');";
+        $timestamp = date("Y-m-d H:i:s");
+        $query = "INSERT IGNORE INTO Likes (pid, uid, timestamp) VALUES ('$pid','$uid','$timestamp');";
         $result = mysqli_query($db, $query);
         if ($result) {
             $sRow["userLiked"] = true;

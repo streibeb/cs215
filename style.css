@@ -393,3 +393,18 @@ p.charCounterError {
 	color: red;
 	font-size: 12px;
 }
+
+#pageIndicator {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#ajaxToggle {
+    text-decoration: underline;
+    color: #AA0000;
+}
+
+#ajaxToggle:hover {
+    color: #EE0000;
+    cursor: pointer;
+}
