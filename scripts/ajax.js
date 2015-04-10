@@ -95,8 +95,6 @@ function RefreshPosts() {
             for (var i = 0; i < responseObj.update.length; i++) {
                 UpdatePost(document, responseObj.update[i])
             }
-
-            updateTimer = Date().now;
         }
     }
     var url = "getPosts.php?updateTime="+Math.floor(lastUpdate/1000);
@@ -120,8 +118,6 @@ function RefreshComments() {
                 likeButton.className = responseObj.post[i].userLiked ? "likeButtonPressed" : "likeButton";
                 likeButton.innerHTML = responseObj.post[i].numLikes;
             }
-
-            updateTimer = Date().now;
         }
     }
     var post = document.getElementsByClassName("post");
@@ -139,7 +135,6 @@ function PingServer() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
             console.log(xhr.responseText);
-            updateTimer = Date().now;
         }
     }
     var url = "getTime.php?t="+Math.floor(lastUpdate/1000);

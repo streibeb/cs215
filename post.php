@@ -84,7 +84,15 @@ if (isset($_GET["pid"])) {
         die ("Failed to connect to database: " . mysqli_connect_error());
     }
 
-    $query = "SELECT Posts.*, Users.* FROM Posts JOIN Users ON Posts.uid = Users.uid WHERE pid = '$pid';";
+    $uid = $loggedIn ? $_SESSION["uid"] : 0;
+    $query = "SELECT Posts.*,
+    Users.first_name,
+    Users.last_name,
+    (SELECT COUNT(1) FROM Likes WHERE Posts.pid = Likes.pid) as 'numLikes',
+    (SELECT 1 FROM Likes WHERE Likes.uid = '$uid' AND Posts.pid = Likes.pid) AS 'userLiked'
+    FROM Posts
+    JOIN Users ON Posts.uid = Users.uid
+    WHERE pid = '$pid';";
     $posts = mysqli_query($db, $query);
     if (mysqli_num_rows($posts) != 1) {
         $err = "404";
@@ -129,7 +137,7 @@ if (isset($_GET["pid"])) {
                     <div class="postProfileName"><?php echo $post["first_name"]. " " . $post["last_name"]; ?></div>
                     <div class="postProfileInfo">
                         <div class="right">
-                            <button id="<?php echo "likeButton_".$post["pid"];?>" class="likeButton"></button>
+                            <button id="<?php echo "likeButton_".$post["pid"];?>" class="likeButton"><?=$post["numLikes"]?></button>
                         </div>
                         <div class="right">
                             <span class="postDate"><?php echo $post["timestamp"];?></span>
